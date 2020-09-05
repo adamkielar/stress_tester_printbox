@@ -1,22 +1,24 @@
 import argparse
-import socket
+import threading
 import urllib.parse
 from http.client import HTTPConnection
 
 
-def test_server(number: int, request_number: int, ):
-    params = urllib.parse.urlencode({'number': number, 'perf': request_number})
+def test_server(number: int, request_number: int):
+    params = urllib.parse.urlencode({'number': number, 'perf': 1})
     path = f'/prime?{params}'
+    
     conn = HTTPConnection('localhost', 8080)
-    conn.request('GET', path)
-    response = conn.getresponse()
-    print(response.status, response.reason, response.msg)
-    print(response.read())
-    conn.close()
+
+    for index in range(0, request_number):
+        print('Request number ', index)
+        conn.request('GET', path)
+        response = conn.getresponse()
+        print(response.status, response.reason, response.msg)
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Started testing server.')
+    parser = argparse.ArgumentParser(description='Started testing client.')
     parser.add_argument('-n', '--number', default=1000000000001,
                         help='prime number', type=int)
     parser.add_argument('-r', '--request_number', default=1,
@@ -24,4 +26,10 @@ if __name__ == '__main__':
     parser.add_argument('-t', '--thread_number', default=1,
                         help='number of connections', type=int)
     args = parser.parse_args()
-    test_server(args.number, args.request_number)
+
+    threads = list()
+    for index in range(0, args.thread_number):
+        print('Thread number ', index)
+        client = threading.Thread(target=test_server(args.number, args.request_number), args=(index,))
+        client.start()
+    # test_server(args.number, args.request_number)
