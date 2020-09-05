@@ -24,7 +24,7 @@ def test_server(number: int, request_number: int):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Started testing client.')
     parser.add_argument('-n', '--number', default=1000000000001,
-                        help='prime number', type=int)
+                        help='number', type=int)
     parser.add_argument('-r', '--request_number', default=1,
                         help='number of request', type=int)
     parser.add_argument('-t', '--thread_number', default=1,
