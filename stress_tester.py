@@ -1,8 +1,10 @@
 import argparse
+import statistics
 import threading
 import urllib.parse
 from http.client import HTTPConnection
 
+elapsed_list = []
 
 def test_server(number: int, request_number: int):
     params = urllib.parse.urlencode({'number': number, 'perf': 1})
@@ -14,7 +16,9 @@ def test_server(number: int, request_number: int):
         print('Request number ', index)
         conn.request('GET', path)
         response = conn.getresponse()
-        print(response.status, response.reason, response.msg)
+        elapsed_number = float(response.getheader('x-exec-time'))
+        elapsed_list.append(elapsed_number)
+    
 
 
 if __name__ == '__main__':
@@ -32,4 +36,10 @@ if __name__ == '__main__':
         print('Thread number ', index)
         client = threading.Thread(target=test_server(args.number, args.request_number), args=(index,))
         client.start()
-    # test_server(args.number, args.request_number)
+
+    print('Elapsed list ', elapsed_list)
+    print('Min of data: ', min(elapsed_list))
+    print('Max of data: ', max(elapsed_list))
+    print('Mean of data: ', statistics.mean(elapsed_list))
+    print('Median of data: ', statistics.median(elapsed_list))
+    print('Standard deviation: ', statistics.stdev(elapsed_list))
